@@ -75,6 +75,3 @@ This tool is intended for **educational and personal use** only. The key is held
 
 ---
 
-## 📄 License
-
-MIT License — feel free to use and modify.
