@@ -2,11 +2,9 @@ import sys
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     print("You didnt provide enough arguments")
     exit()
-
-key = get_random_bytes(32)
 
 def encrypt(text, key):
     cipher = AES.new(key, AES.MODE_GCM)
@@ -30,18 +28,26 @@ def write_file(path, content):
         file.write(content)
 
 if __name__ == '__main__':
-    key = get_random_bytes(32)
 
-    file_path = sys.argv[1]
+    if sys.argv[2] == "encrypt":
+        key = get_random_bytes(32)
+        write_file("key.txt", key)
 
-    bytes_text = read_file(file_path)
+        bytes_text = read_file(sys.argv[1])
 
-    nonce, tag, ciphertext = encrypt(bytes_text, key)
+        nonce, tag, ciphertext = encrypt(bytes_text, key)
+        write_file("nonce.txt", nonce)
+        write_file("tag.txt", tag)
 
-    write_file(sys.argv[1], ciphertext)
+        write_file(sys.argv[1], ciphertext)
 
-    input("File got encrypted, press enter to decrypt")
+        print("File got encrypted")
 
+    elif sys.argv[2] == "decrypt":
 
-    decrypted_output = decrypt(ciphertext, key, nonce, tag)
-    write_file(sys.argv[1], decrypted_output)
+        decrypted_output = decrypt(read_file(sys.argv[1]), read_file("key.txt"), read_file("nonce.txt"), read_file("tag.txt"))
+        write_file(sys.argv[1], decrypted_output)
+        print("File decrypted successfully")
+
+    else:
+        print("You didnt provide the right arguments")
