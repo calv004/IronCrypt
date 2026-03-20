@@ -1,4 +1,6 @@
 import sys
+import os
+from pathlib import Path
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
@@ -33,13 +35,18 @@ if __name__ == '__main__':
         key = get_random_bytes(32)
         write_file("key.txt", key)
 
-        bytes_text = read_file(sys.argv[1])
+        for i in Path(sys.argv[1]).iterdir():
+            if i.is_file():
+                bytes_text = read_file(i)
+                nonce, tag, ciphertext = encrypt(bytes_text, key)
 
-        nonce, tag, ciphertext = encrypt(bytes_text, key)
-        write_file("nonce.txt", nonce)
-        write_file("tag.txt", tag)
+                if i == "tag.txt" or i == "nonce.txt":
+                    continue
+                else:
+                    write_file("nonce.txt", nonce)
+                    write_file("tag.txt", tag)
 
-        write_file(sys.argv[1], ciphertext)
+                write_file(i, ciphertext)
 
         print("File got encrypted")
 
